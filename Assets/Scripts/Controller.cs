@@ -236,17 +236,53 @@ public class Controller : MonoBehaviour
 
         //La ponemos rosa porque acabamos de hacer un reset
         tiles[indexcurrentTile].current = true;
+        tiles[indexcurrentTile].visited = true;
 
         //Cola para el BFS
         Queue<Tile> nodes = new Queue<Tile>();
 
-        //TODO: Implementar BFS. Los nodos seleccionables los ponemos como selectable=true
-        //Tendrás que cambiar este código por el BFS
-        for(int i = 0; i < Constants.NumTiles; i++)
+        //Posicion de los policias
+        List<int> policias = new List<int>();
+        foreach(GameObject policia in cops)
         {
-            tiles[i].selectable = true;
+            policias.Add(policia.GetComponent<CopMove>().currentTile);
         }
 
+        //Adyacentes del tile donde estás
+        foreach(int casilla in tiles[indexcurrentTile].adjacency)
+        {
+            tiles[casilla].parent = tiles[indexcurrentTile];
+            nodes.Enqueue(tiles[casilla]);
+        }
+
+        while (nodes.Count > 0)
+        {
+            Tile nodoActual = nodes.Dequeue();
+            if(!nodoActual.visited)
+            {
+                nodoActual.visited = true;
+                nodoActual.distance = nodoActual.parent.distance + 1;
+                if (!policias.Contains(nodoActual.numTile))
+                {
+                    foreach(int indice in nodoActual.adjacency)
+                    {
+                        if(!tiles[indice].visited)
+                        {
+                            tiles[indice].parent = nodoActual;
+                            nodes.Enqueue(tiles[indice]);
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach (Tile tile in tiles)
+        {
+            if (tile.distance <= 2 && !policias.Contains(tile.numTile))
+            {
+                tile.selectable = true;
+            }
+        }
 
     }
     
