@@ -177,13 +177,24 @@ public class Controller : MonoBehaviour
         clickedTile = robber.GetComponent<RobberMove>().currentTile;
         tiles[clickedTile].current = true;
         FindSelectableTiles(false);
+        List<Tile> adyacentesRobber = new List<Tile>();
 
-        /*TODO: Cambia el código de abajo para hacer lo siguiente
-        - Elegimos una casilla aleatoria entre las seleccionables que puede ir el caco
-        - Movemos al caco a esa casilla
-        - Actualizamos la variable currentTile del caco a la nueva casilla
-        */
-        robber.GetComponent<RobberMove>().MoveToTile(tiles[robber.GetComponent<RobberMove>().currentTile]);
+        foreach(Tile tile in tiles)
+        {
+            if(tile.selectable)
+            {
+                adyacentesRobber.Add(tile);
+            }
+        }
+        Tile casilla;
+        do
+        {
+            casilla = adyacentesRobber[Random.Range(0, adyacentesRobber.Count - 1)];
+        }
+        while (casilla.numTile == robber.GetComponent<RobberMove>().currentTile);
+
+        robber.GetComponent<RobberMove>().currentTile = casilla.numTile;
+        robber.GetComponent<RobberMove>().MoveToTile(casilla);
     }
 
     public void EndGame(bool end)
